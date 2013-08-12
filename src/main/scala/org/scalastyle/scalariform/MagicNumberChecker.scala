@@ -25,13 +25,16 @@ import org.scalastyle.ScalastyleError
 
 import scalariform.lexer.Tokens.INTEGER_LITERAL
 import scalariform.lexer.Tokens.VAL
-import scalariform.lexer.Token
-import scalariform.parser.CompilationUnit
-import scalariform.parser.Expr
-import scalariform.parser.ExprElement
-import scalariform.parser.GeneralTokens
+import scalariform.lexer.{Tokens, Token}
+import scalariform.parser._
 import scalariform.parser.PatDefOrDcl
+import scalariform.lexer.Token
+import scala.Some
+import scalariform.parser.GeneralTokens
+import scalariform.parser.Expr
 import scalariform.parser.PrefixExprElement
+import scalariform.parser.CompilationUnit
+import org.scalastyle.PositionError
 
 class MagicNumberChecker extends ScalariformChecker {
   val DefaultIgnore = "-1,0,1,2"
@@ -51,10 +54,10 @@ class MagicNumberChecker extends ScalariformChecker {
     val valList = (for (
       t <- localvisitVal(ast.immediateChildren(0));
       f <- traverseVal(t);
-      g <- toOption(f)
+      Some(g) <- toOption(f)
     ) yield {
       g
-    }).map( d => d match {
+    }).map(d => d match {
       case Expr(List(t: Expr)) => t
       case _ => d
     })
@@ -108,16 +111,37 @@ class MagicNumberChecker extends ScalariformChecker {
 
   private def localvisitVal(ast: Any): List[PatDefOrDclVisit] = ast match {
     case t: PatDefOrDcl => List(PatDefOrDclVisit(t, t.valOrVarToken, localvisitVal(t.pattern),
-                                    localvisitVal(t.otherPatterns), localvisitVal(t.equalsClauseOption)))
+      localvisitVal(t.otherPatterns), localvisitVal(t.equalsClauseOption)))
     case t: Any => VisitorHelper.visit(t, localvisitVal)
   }
 
   private def traverseVal(t: PatDefOrDclVisit): List[PatDefOrDclVisit] = t :: t.equalsClauseOption.map(traverseVal(_)).flatten
 
-  private def toOption(t: PatDefOrDclVisit): Option[Expr] = {
-    t.t.equalsClauseOption match {
-      case Some((equals: Token, expr: Expr)) if (t.t.valOrVarToken.tokenType == VAL && toIntegerLiteralExprElement(expr.contents).isDefined) => Some(expr)
-      case _ => None
-    }
+  private def toOption(t: PatDefOrDclVisit): List[Option[Expr]] = t.t.equalsClauseOption match {
+    case Some((equals: Token, expr: Expr)) if (t.t.valOrVarToken.tokenType == VAL && toIntegerLiteralExprElement(expr.contents).isDefined) => List(Some(expr))
+    case Some((equals: Token, expr: Expr)) if (t.t.valOrVarToken.tokenType == VAL) && isPatternHasConstant(t.t)
+    => patternHasConstantVisit(expr.contents)
+    case _ => List()
   }
+
+  private def isPatternHasConstant(t: PatDefOrDcl): Boolean = t.pattern.tokens.filter(_.tokenType.equals(Tokens.VARID)).find(_.text.head.isUpper).isDefined
+
+  private def patternHasConstantVisit(t: List[ExprElement]): List[Option[Expr]] = t match {
+    case List(n: New) => n.template.templateParentsOpt match {
+      case Some(x) => argumentExprsVisit(x.argumentExprss)
+      case _ => List()
+    }
+    case List(c: CallExpr) => argumentExprsVisit(c.newLineOptsAndArgumentExprss.map(_._2))
+    case _ => List()
+  }
+
+  private def argumentExprsVisit(argumentExprs: List[ArgumentExprs]): List[Option[Expr]] = argumentExprs.flatMap {
+    case paren: ParenArgumentExprs => paren.contents.map {
+      case a: Argument if toIntegerLiteralExprElement(a.expr.contents).isDefined => List(Some(a.expr))
+      case a: Argument => patternHasConstantVisit(a.expr.contents)
+      case _ => List()
+    }
+    case _ => List()
+  }.flatten
+
 }

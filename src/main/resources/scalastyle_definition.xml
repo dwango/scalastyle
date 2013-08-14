@@ -140,4 +140,5 @@
             <parameter name="maxVariableLength" type="integer" default="1" />
         </parameters>
     </checker>
+    <checker class="org.scalastyle.scalariform.RemovableMatchChecker" id="removable.match" defaultLevel="warning"/>
 </scalastyle-definition>

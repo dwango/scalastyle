@@ -116,4 +116,5 @@
    <parameter name="maxVariableLength"><![CDATA[1]]></parameter>
   </parameters>
  </check>
+ <check level="warning" class="org.scalastyle.scalariform.RemovableMatchChecker" enabled="true"></check>
 </scalastyle>

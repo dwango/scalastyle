@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>jp.co.dwango</groupId>
+  <artifactId>scalastyle_2.10.1</artifactId>
+  <versioning>
+    <versions>
+      <version>0.3.3-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20130816115129</lastUpdated>
+  </versioning>
+</metadata>

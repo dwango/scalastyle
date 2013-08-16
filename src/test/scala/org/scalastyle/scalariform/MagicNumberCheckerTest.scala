@@ -46,7 +46,7 @@ class Foobar {
   val foo5 = 3
   val foo6 = 4
 }
-                 """;
+""";
 
     assertErrors(List(), source)
   }
@@ -64,7 +64,7 @@ class Foobar {
   var foo5 = 3
   var foo6 = 4
 }
-                 """;
+""";
 
     assertErrors(List(columnError(5, 13), columnError(10, 13), columnError(11, 13)), source)
   }
@@ -82,7 +82,7 @@ class Foobar {
 
   def fn(i: Int, j: Int) = i + j
 }
-                 """;
+""";
 
     assertErrors(List(columnError(5, 13), columnError(6, 13), columnError(7, 13), columnError(8, 16), columnError(8, 19), columnError(9, 19)), source)
   }
@@ -98,9 +98,10 @@ class Foobar {
   val Foo = List(1234)
   val Bar = new Array[Int](1234)
   val Foo = List(new Array[Int](1234),new Array[Int](1234))
+  val List(a, b, c) = List(123, 456, 789)
 }
-                 """;
+""";
 
-    assertErrors(List(columnError(5, 17), columnError(6, 27), columnError(7, 32), columnError(7, 53)), source)
+    assertErrors(List(columnError(5, 17), columnError(6, 27), columnError(7, 32), columnError(7, 53), columnError(11, 27), columnError(11, 32), columnError(11, 37)), source)
   }
 }

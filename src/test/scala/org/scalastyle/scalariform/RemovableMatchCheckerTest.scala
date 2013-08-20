@@ -84,4 +84,19 @@ class KO {
 
     assertErrors(List(columnError(7, 6), columnError(14, 30), columnError(17, 34)), source)
   }
+
+  @Test def testVariableHasSameNameInTargetCalls() = {
+    val source = """
+package foobar
+
+class Foo {
+  val count = 1
+  val bar = {
+    count + count
+  }
+}
+                 """;
+
+    assertErrors(List(), source)
+  }
 }

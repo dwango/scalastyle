@@ -33,14 +33,16 @@ class RemovableMatchChecker extends ScalariformChecker {
     "forall", "foreach", "groupBy", "indexWhere", "lastIndexWhere", "map", "mapConserve", "maxBy", "minBy",
     "partition", "prefixLength", "reverseMap", "segmentLength", "sortBy", "span", "takeWhile", "withFilter")
 
-  final def verify(ast: CompilationUnit): List[ScalastyleError] = {
+  final def verify(ast: CompilationUnit): List[ScalastyleError] =
     getAllCallExpr(ast).withFilter(t => targetCalls.contains(t.id.text) && hasRemovableMatch(t))
       .map(t => PositionError(t.id.offset))
       .toList
-  }
 
   private def hasRemovableMatch(c: CallExpr): Boolean = {
-    val anonymousFunction = findAnonymousFunction(c.newLineOptsAndArgumentExprss(0)._2)
+    val anonymousFunction = c.newLineOptsAndArgumentExprss match {
+      case x::_ => findAnonymousFunction(x._2)
+      case _ => None
+    }
 
     anonymousFunction match {
       case Some(f) => isRemovable(f)
@@ -60,16 +62,12 @@ class RemovableMatchChecker extends ScalariformChecker {
     case _ => false
   }
 
-  private def findAnonymousFunction(ast: AstNode, level: Int = 0): Option[AnonymousFunction] = {
-    if (level > 3) {
-      return None
-    }
+  private def findAnonymousFunction(ast: AstNode, level: Int = 0): Option[AnonymousFunction] =
     ast.immediateChildren.headOption match {
+      case opt if level > 3 || opt.isEmpty => None
       case Some(n: AnonymousFunction) => Some(n)
       case Some(n) => findAnonymousFunction(n)
-      case _ => None
     }
-  }
 
   private def getAllCallExpr(ast: Any): List[CallExpr] = ast match {
     case t: CallExpr => t :: visit(t.immediateChildren, getAllCallExpr)

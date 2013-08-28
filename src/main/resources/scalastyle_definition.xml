@@ -142,7 +142,7 @@
     <checker class="org.scalastyle.scalariform.BlockImportChecker" id="block.import" defaultLevel="warning"/>
     <checker class="org.scalastyle.scalariform.ProcedureDeclarationChecker" id="procedure.declaration" defaultLevel="warning"/>
     <checker class="org.scalastyle.scalariform.NoWhitespaceBeforeColonChecker" id="no.whitespace.before.colon" defaultLevel="warning"/>
-    <checker class="org.scalastyle.scalariform.WhitespaceAfterColonChecker" id="no.whitespace.after.colon" defaultLevel="warning"/>
+    <checker class="org.scalastyle.scalariform.WhitespaceAfterColonChecker" id="whitespace.after.colon" defaultLevel="warning"/>
     <checker class="org.scalastyle.scalariform.GeneratorVariableLengthChecker" id="generator.variable.length" defaultLevel="warning" >
         <parameters>
             <parameter name="maxVariableLength" type="integer" default="1" />

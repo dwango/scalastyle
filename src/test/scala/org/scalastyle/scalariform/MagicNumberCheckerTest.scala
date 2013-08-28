@@ -86,4 +86,22 @@ class Foobar {
 
     assertErrors(List(columnError(5, 13), columnError(6, 13), columnError(7, 13), columnError(8, 16), columnError(8, 19), columnError(9, 19)), source)
   }
+
+  @Test def testIgnoreValStartsWithUpper() {
+    val source = """
+package foobar
+
+class Foobar {
+  val foo = List(1234)
+  val bar = new Array[Int](1234)
+  val foo = List(new Array[Int](1234),new Array[Int](1234))
+  val Foo = List(1234)
+  val Bar = new Array[Int](1234)
+  val Foo = List(new Array[Int](1234),new Array[Int](1234))
+  val List(a, b, c) = List(123, 456, 789)
+}
+""";
+
+    assertErrors(List(columnError(5, 17), columnError(6, 27), columnError(7, 32), columnError(7, 53), columnError(11, 27), columnError(11, 32), columnError(11, 37)), source)
+  }
 }

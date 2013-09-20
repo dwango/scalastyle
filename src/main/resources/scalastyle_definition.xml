@@ -77,6 +77,12 @@
     </checker>
     <checker class="org.scalastyle.scalariform.UppercaseLChecker" id="uppercase.l" defaultLevel="warning" />
     <checker class="org.scalastyle.scalariform.SimplifyBooleanExpressionChecker" id="simplify.boolean.expression" defaultLevel="warning" />
+    <checker class="org.scalastyle.scalariform.SimpleExprWithBraceChecker" id="simple.expression.with.brace" defaultLevel="warning" >
+        <parameters>
+            <parameter name="targetTokens" type="string" default="" />
+            <parameter name="nestedAllowed" type="boolean" default="false" />
+        </parameters>
+    </checker>
     <checker class="org.scalastyle.scalariform.IfBraceChecker" id="if.brace" defaultLevel="warning" >
         <parameters>
             <parameter name="singleLineAllowed" type="boolean" default="true" />
@@ -145,4 +151,10 @@
           <parameter name="lineBreakAllowed" type="boolean" default="false" />
       </parameters>
     </checker>
+    <checker class="org.scalastyle.scalariform.GeneratorVariableLengthChecker" id="generator.variable.length" defaultLevel="warning" >
+        <parameters>
+            <parameter name="maxVariableLength" type="integer" default="1" />
+        </parameters>
+    </checker>
+    <checker class="org.scalastyle.scalariform.RemovableMatchChecker" id="removable.match" defaultLevel="warning"/>
 </scalastyle-definition>

@@ -16,22 +16,25 @@
 
 package org.scalastyle.scalariform
 
-import scala.Option.option2Iterable
-
 import org.scalastyle.scalariform.VisitorHelper.Clazz
-import org.scalastyle.PositionError
 import org.scalastyle.ScalariformChecker
 import org.scalastyle.ScalastyleError
-
+import org.scalastyle.PositionError
+import scalariform.lexer.Tokens.VARID
 import scalariform.lexer.Tokens.INTEGER_LITERAL
 import scalariform.lexer.Tokens.VAL
 import scalariform.lexer.Token
-import scalariform.parser.CompilationUnit
-import scalariform.parser.Expr
-import scalariform.parser.ExprElement
 import scalariform.parser.GeneralTokens
+import scalariform.parser.Expr
+import scalariform.parser.Argument
+import scalariform.parser.ArgumentExprs
+import scalariform.parser.ParenArgumentExprs
+import scalariform.parser.ExprElement
 import scalariform.parser.PatDefOrDcl
+import scalariform.parser.New
+import scalariform.parser.CallExpr
 import scalariform.parser.PrefixExprElement
+import scalariform.parser.CompilationUnit
 
 class MagicNumberChecker extends ScalariformChecker {
   val DefaultIgnore = "-1,0,1,2"
@@ -51,13 +54,13 @@ class MagicNumberChecker extends ScalariformChecker {
     val valList = (for (
       t <- localvisitVal(ast.immediateChildren(0));
       f <- traverseVal(t);
-      g <- toOption(f)
+      g <- listAllowedMagicNumbers(f)
     ) yield {
       g
-    }).map( d => d match {
+    }).map{
       case Expr(List(t: Expr)) => t
-      case _ => d
-    })
+      case d => d
+    }
 
     intList.filter(t => !valList.contains(t.t)).map(t => PositionError(t.position)).toList
   }
@@ -108,16 +111,46 @@ class MagicNumberChecker extends ScalariformChecker {
 
   private def localvisitVal(ast: Any): List[PatDefOrDclVisit] = ast match {
     case t: PatDefOrDcl => List(PatDefOrDclVisit(t, t.valOrVarToken, localvisitVal(t.pattern),
-                                    localvisitVal(t.otherPatterns), localvisitVal(t.equalsClauseOption)))
+      localvisitVal(t.otherPatterns), localvisitVal(t.equalsClauseOption)))
     case t: Any => VisitorHelper.visit(t, localvisitVal)
   }
 
   private def traverseVal(t: PatDefOrDclVisit): List[PatDefOrDclVisit] = t :: t.equalsClauseOption.map(traverseVal(_)).flatten
 
-  private def toOption(t: PatDefOrDclVisit): Option[Expr] = {
-    t.t.equalsClauseOption match {
-      case Some((equals: Token, expr: Expr)) if (t.t.valOrVarToken.tokenType == VAL && toIntegerLiteralExprElement(expr.contents).isDefined) => Some(expr)
-      case _ => None
-    }
+  private def listAllowedMagicNumbers(t: PatDefOrDclVisit): List[Expr] = t.t.equalsClauseOption match {
+    case Some((equals: Token, expr: Expr)) if t.t.valOrVarToken.tokenType == VAL =>
+      if(toIntegerLiteralExprElement(expr.contents).isDefined) {
+        List(expr)
+      }else if(isPatternHasConstant(t.t)) {
+        patternHasConstantVisit(expr.contents)
+      }else {
+        List()
+      }
+
+    case _ => List()
   }
+
+  private def isPatternHasConstant(t: PatDefOrDcl): Boolean = t.pattern.contents match {
+    case List(GeneralTokens(List(t: Token))) if t.tokenType.equals(VARID) && t.text.head.isUpper => true
+    case _ => false
+  }
+
+  private def patternHasConstantVisit(t: List[ExprElement]): List[Expr] = t match {
+    case List(n: New) => n.template.templateParentsOpt match {
+      case Some(x) => argumentExprsVisit(x.argumentExprss)
+      case _ => List()
+    }
+    case List(c: CallExpr) => argumentExprsVisit(c.newLineOptsAndArgumentExprss.map(_._2))
+    case _ => List()
+  }
+
+  private def argumentExprsVisit(argumentExprs: List[ArgumentExprs]): List[Expr] = argumentExprs.flatMap {
+    case paren: ParenArgumentExprs => paren.contents.map {
+      case a: Argument if toIntegerLiteralExprElement(a.expr.contents).isDefined => List(a.expr)
+      case a: Argument => patternHasConstantVisit(a.expr.contents)
+      case _ => List()
+    }
+    case _ => List()
+  }.flatten
+
 }

@@ -117,13 +117,16 @@ class NoWhitespaceBeforeColonChecker extends ColonChecker {
   val paramLineBreakAllowed = "lineBreakAllowed"
 
   def localMatcher(prev: Token, current: Token, next: Token, lines: Lines) = {
+
     val allowLineBreak = getBoolean(paramLineBreakAllowed, false)
+    val existsWhitespaces = charsBetweenTokens(prev, current) != 0
+    val notExistsSingleLine = linesBetweenTokens(lines, prev, current) != 1
 
     allowLineBreak match {
       case true =>
-        isSingleColonToken(current, next) && !(charsBetweenTokens(prev, current) == 0 || linesBetweenTokens(lines, prev, current) == 1)
+        isSingleColonToken(current, next) && existsWhitespaces && notExistsSingleLine
       case false =>
-        isSingleColonToken(current, next) && !(charsBetweenTokens(prev, current) == 0)
+        isSingleColonToken(current, next) && existsWhitespaces
     }
   }
 }
@@ -136,13 +139,16 @@ class WhitespaceAfterColonChecker extends ColonChecker {
   val paramLineBreakAllowed = "lineBreakAllowed"
 
   def localMatcher(prev: Token, current: Token, next: Token, lines: Lines) = {
+
     val allowLineBreak = getBoolean(paramLineBreakAllowed, false)
+    val notExistsSingleWhitespace = charsBetweenTokens(current, next)  != 1
+    val notExistsSingleLine = linesBetweenTokens(lines, current, next) != 1
 
     allowLineBreak match {
       case true =>
-        isSingleColonToken(current, next) && !(charsBetweenTokens(current, next) == 1 || linesBetweenTokens(lines, current, next) == 1)
+        isSingleColonToken(current, next) && notExistsSingleWhitespace && notExistsSingleLine
       case false =>
-        isSingleColonToken(current, next) && !(charsBetweenTokens(current, next) == 1)
+        isSingleColonToken(current, next) && notExistsSingleWhitespace
     }
   }
 }

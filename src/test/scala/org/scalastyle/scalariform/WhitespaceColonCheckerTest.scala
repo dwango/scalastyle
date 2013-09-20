@@ -38,7 +38,6 @@ class Foobar(a: Int, b: Int) { }
     assertErrors(List(), source)
   }
 
-
   @Test def testClassStatementKO() {
     val source = """
 case class SomeClass(x : Int)
@@ -58,6 +57,9 @@ class Foobar() {
     val l = 1 :: List(2, 3)
   }
   def bar: Unit { }
+  def baz(x: Int)(implicit y: Int): Int = x
+  def foobar[T]: Int = 1
+  def foobaz[T](x: Int): Int = 1
 }
                  """;
 
@@ -74,10 +76,13 @@ class Foobar() {
     val l = 1 :: List(2, 3)
   }
   def bar : Unit { }
+  def foobar[T] : Int = 1
+  def foobaz[T](x : Int) : Int = 1
 }
                  """;
 
-    assertErrors(List(columnError(3, 11), columnError(4, 15), columnError(6, 10), columnError(9, 10)), source)
+    assertErrors(List(columnError(3, 11), columnError(4, 15), columnError(6, 10),
+      columnError(9, 10), columnError(10, 16), columnError(11, 18), columnError(11, 25)), source)
   }
 
   @Test def testCaseStatementOK() {
@@ -117,6 +122,48 @@ class Foobar() {
 
     assertErrors(List(columnError(8, 13), columnError(9, 13)), source)
   }
+
+  @Test def testLineBreakAllowed() {
+    val source = """
+case class Something()
+case class Anything()
+
+class Foobar() {
+  def bar(
+    veryLongArgumentFoo: Int,
+    veryLongArgumentBar: Int)
+  : Unit {
+    val a: Int = 0
+    val b
+    : Int = 0
+  }
+}
+                 """;
+
+    assertErrors(List(), source, Map("lineBreakAllowed" -> "true"))
+  }
+
+  @Test def testLineBreakNotAllowed() {
+    val source = """
+case class Something()
+case class Anything()
+
+class Foobar() {
+  def bar(
+    veryLongArgumentFoo: Int,
+    veryLongArgumentBar: Int)
+  : Unit {
+    val a :
+     Int = 0
+    val b
+    : Int = 0
+  }
+}
+                 """;
+
+    assertErrors(List(columnError(9, 2), columnError(10, 10), columnError(13, 4)), source, Map("lineBreakAllowed" -> "false"))
+  }
+
 }
 
 class WhitespaceAfterColonCheckerTest extends AssertionsForJUnit with CheckerTest {
@@ -155,6 +202,9 @@ class Foobar() {
     val l = 1 :: List(2, 3)
   }
   def bar: Unit { }
+  def baz(x: Int)(implicit y: Int): Int = x
+  def foobar[T]: Int = 1
+  def foobaz[T](x: Int): Int = 1
 }
                  """;
 
@@ -170,11 +220,15 @@ class Foobar() {
     val i :Int = 1
     val l = 1 :: List(2, 3)
   }
-  def bar :Unit { }
+  def bar: Unit { }
+  def baz(x:Int)(implicit y:Int):Int = x
+  def foobar[T]:Int = 1
+  def foobaz[T](x:Int):Int = 1
 }
                  """;
 
-    assertErrors(List(columnError(3, 11), columnError(4, 15), columnError(6, 10), columnError(9, 10)), source)
+    assertErrors(List(columnError(3, 11), columnError(4, 15), columnError(6, 10), columnError(10, 11),
+      columnError(10, 27), columnError(10, 32), columnError(11, 15), columnError(12, 17), columnError(12, 22)), source)
   }
 
   @Test def testCaseStatementOK() {
@@ -213,5 +267,45 @@ class Foobar() {
                  """;
 
     assertErrors(List(columnError(8, 13), columnError(9, 13)), source)
+  }
+
+  @Test def testLineBreakAllowed() {
+    val source = """
+case class Something()
+case class Anything()
+
+class Foobar() {
+  def bar(
+    veryLongArgumentFoo: Int,
+    veryLongArgumentBar: Int):
+    Unit {
+      val a: Int = 0
+      val b:
+      Int = 0
+  }
+}
+                 """;
+
+    assertErrors(List(), source, Map("lineBreakAllowed" -> "true"))
+  }
+
+  @Test def testLineBreakNotAllowed() {
+    val source = """
+case class Something()
+case class Anything()
+
+class Foobar() {
+  def bar(
+    veryLongArgumentFoo: Int,
+    veryLongArgumentBar: Int):
+    Unit {
+      val a: Int = 0
+      val b:
+      Int = 0
+  }
+}
+                 """;
+
+    assertErrors(List(columnError(8, 29), columnError(11, 11)), source, Map("lineBreakAllowed" -> "false"))
   }
 }

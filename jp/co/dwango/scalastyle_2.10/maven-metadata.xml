@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
   <groupId>jp.co.dwango</groupId>
-  <artifactId>scalastyle_2.9.2</artifactId>
+  <artifactId>scalastyle_2.10</artifactId>
   <versioning>
+    <release>0.3.3</release>
     <versions>
-      <version>0.3.3-SNAPSHOT</version>
+      <version>0.3.3</version>
     </versions>
-    <lastUpdated>20130926084628</lastUpdated>
+    <lastUpdated>20130926084516</lastUpdated>
   </versioning>
 </metadata>

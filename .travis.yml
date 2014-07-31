@@ -1,9 +1,13 @@
 language: scala
 scala:
-  - 2.10.2
+  - 2.10.3
 jdk:
+  - oraclejdk7
   - openjdk7
 script: mvn test
 branches:
  only:
   - master
+notifications:
+  email:
+    - matthew@farwell.co.uk

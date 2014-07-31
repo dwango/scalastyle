@@ -121,4 +121,6 @@
    <parameter name="maxVariableLength"><![CDATA[1]]></parameter>
   </parameters>
  </check>
+ <check level="warning" class="org.scalastyle.scalariform.ForBraceChecker" enabled="true"/>
+ <check level="warning" class="org.scalastyle.scalariform.SpaceAfterCommentStartChecker" enabled="true"/>
 </scalastyle>

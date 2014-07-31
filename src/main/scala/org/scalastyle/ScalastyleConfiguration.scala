@@ -36,16 +36,19 @@ import scala.xml.Attribute
 object Level {
   val Warning = "warning"
   val Error = "error"
+  val Info = "info"
 
   def apply(s: String): Level = s match {
     case Warning => WarningLevel
     case Error => ErrorLevel
+    case Info => InfoLevel
     case _ => WarningLevel
   }
 }
 sealed abstract class Level(val name: String)
 case object ErrorLevel extends Level(Level.Error)
 case object WarningLevel extends Level(Level.Warning)
+case object InfoLevel extends Level(Level.Info)
 
 object ParameterType {
   val Integer = "integer"
@@ -114,7 +117,7 @@ object ScalastyleConfiguration {
   def toXml(scalastyleConfiguration: ScalastyleConfiguration): scala.xml.Elem = {
     val elements = scalastyleConfiguration.checks.map(c => {
       val parameters = if (c.parameters.size > 0) {
-        val ps = c.parameters.map( p => {
+        val ps = c.parameters.map(p => {
           val text = toCDATA(p._2)
           <parameter name={p._1}>{text}</parameter>
         })
@@ -216,7 +219,7 @@ class XmlPrettyPrinter(width: Int, step: Int) extends PrettyPrinter(width, step)
       case Text(s) if s.trim() == "" =>
         ;
       case _:Atom[_] | _:Comment | _:EntityRef | _:ProcInstr =>
-        makeBox( ind, node.toString().trim() )
+        makeBox(ind, node.toString().trim() )
       case g @ Group(xs) =>
         traverse(xs.iterator, pscope, ind)
       case _ =>

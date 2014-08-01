@@ -32,6 +32,7 @@
   <parameters>
    <parameter name="maxLineLength"><![CDATA[160]]></parameter>
    <parameter name="tabSize"><![CDATA[4]]></parameter>
+   <parameter name="ignoreImports"><![CDATA[false]]></parameter>
   </parameters>
  </check>
  <check class="org.scalastyle.scalariform.ClassNamesChecker" level="warning" enabled="true">
@@ -154,4 +155,12 @@
   </parameters>
  </check>
  <check class="org.scalastyle.scalariform.RemovableMatchChecker" level="warning" enabled="true"></check>
+</scalastyle>
+ <check class="org.scalastyle.scalariform.ForBraceChecker" level="warning" enabled="true"></check>
+ <check class="org.scalastyle.scalariform.SpaceAfterCommentStartChecker" level="warning" enabled="false"></check>
+ <check class="org.scalastyle.scalariform.ScalaDocChecker" level="warning" enabled="false"></check>
+ <check class="org.scalastyle.scalariform.DisallowSpaceAfterTokenChecker" level="warning" enabled="false"></check>
+ <check class="org.scalastyle.scalariform.DisallowSpaceBeforeTokenChecker" level="warning" enabled="false"></check>
+ <check class="org.scalastyle.scalariform.EnsureSingleSpaceAfterTokenChecker" level="warning" enabled="false"></check>
+ <check class="org.scalastyle.scalariform.EnsureSingleSpaceBeforeTokenChecker" level="warning" enabled="false"></check>
 </scalastyle>

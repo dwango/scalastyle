@@ -18,7 +18,8 @@
 	<checker class="org.scalastyle.file.FileLineLengthChecker" id="line.size.limit" defaultLevel="warning" >
 		<parameters>
             <parameter name="maxLineLength" type="integer" default="160" />
-            <parameter name="tabSize"  type="integer" default="4" />
+            <parameter name="tabSize" type="integer" default="4" />
+            <parameter name="ignoreImports" type="boolean" default="false" />
 		</parameters>
 	</checker>
     <checker class="org.scalastyle.scalariform.ClassNamesChecker" id="class.name" defaultLevel="warning">
@@ -157,4 +158,13 @@
         </parameters>
     </checker>
     <checker class="org.scalastyle.scalariform.RemovableMatchChecker" id="removable.match" defaultLevel="warning"/>
+    <checker class="org.scalastyle.scalariform.ForBraceChecker" id="for.brace" defaultLevel="warning"/>
+    <checker class="org.scalastyle.scalariform.SpaceAfterCommentStartChecker" id="space.after.comment.start" defaultLevel="warning"/>
+
+    <checker class="org.scalastyle.scalariform.ScalaDocChecker" id="scaladoc" defaultLevel="warning"/>
+    <checker class="org.scalastyle.scalariform.DisallowSpaceAfterTokenChecker" id="disallow.space.after.token" defaultLevel="warning"/>
+    <checker class="org.scalastyle.scalariform.DisallowSpaceBeforeTokenChecker" id="disallow.space.before.token" defaultLevel="warning"/>
+    <checker class="org.scalastyle.scalariform.EnsureSingleSpaceAfterTokenChecker" id="ensure.single.space.after.token" defaultLevel="warning"/>
+    <checker class="org.scalastyle.scalariform.EnsureSingleSpaceBeforeTokenChecker" id="ensure.single.space.before.token" defaultLevel="warning"/>
+    <checker class="org.scalastyle.scalariform.BlankLineBetweenDefinitionChecker" id="blankline.between.definition" defaultLevel="warinig"/>
 </scalastyle-definition>

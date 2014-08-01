@@ -60,12 +60,14 @@ class FileLineLengthChecker extends FileChecker {
 
   def verify(lines: Lines): List[ScalastyleError] = {
     val maxLineLength = getInt("maxLineLength", DefaultMaxLineLength)
+    val ignoreImports = getBoolean("ignoreImports", false)
     val tabSize = getInt("tabSize", DefaultTabSize)
 
-    val errors = for (
+    val importPattern = """^\s*import""".r
+    val errors = for {
       line <- lines.lines.zipWithIndex;
-      if replaceTabs(line._1.text, tabSize).length() > maxLineLength
-    ) yield {
+      if (replaceTabs(line._1.text, tabSize).length() > maxLineLength && !(ignoreImports && importPattern.findFirstIn(line._1.text).isDefined))
+    } yield {
       LineError(line._2 + 1, List("" + maxLineLength))
     }
 

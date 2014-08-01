@@ -34,10 +34,10 @@ abstract class AbstractImportChecker extends ScalariformChecker {
   def verify(ast: CompilationUnit): List[ScalastyleError] = {
     init()
 
-    val it = for (
+    val it = for {
       t <- localvisit(ast.immediateChildren);
       f <- traverse(t)
-    ) yield {
+    } yield {
       PositionError(t.t.firstToken.offset)
     }
 
@@ -83,6 +83,7 @@ class IllegalImportsChecker extends AbstractImportChecker {
 
   val DefaultIllegalImports = "sun._"
   var illegalImportsList: List[String] = _
+  var exemptImportsList: List[String] = _
 
   // sun._ => sun\.
   // sun.com.foobar => sun\.com\.foobar
@@ -92,11 +93,13 @@ class IllegalImportsChecker extends AbstractImportChecker {
 
   override protected def init() = {
     illegalImportsList = toMatchList(getString("illegalImports", DefaultIllegalImports))
+    exemptImportsList = toMatchList(getString("exemptImports", ""))
   }
 
   def matches(t: ImportClauseVisit): Boolean = {
     val list = imports(t)
-    illegalImportsList.exists(ill => list.exists(_.startsWith(ill)))
+    val revisedList = list diff exemptImportsList
+    illegalImportsList.exists(ill => revisedList.exists(_.startsWith(ill)))
   }
 }
 

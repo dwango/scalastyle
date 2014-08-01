@@ -34,7 +34,7 @@ class FileLineLengthCheckerTest extends AssertionsForJUnit with CheckerTest {
   val key = "line.size.limit"
   val classUnderTest = classOf[FileLineLengthChecker]
 
-  @Test def testNoMax() {
+  @Test def testNoMax(): Unit = {
     val source = """
 package foobar
 
@@ -45,7 +45,7 @@ package foobar
     assertErrors(List(), source, Map("maxLineLength" -> "20"))
   }
 
-  @Test def testWithOneMax() {
+  @Test def testWithOneMax(): Unit = {
     val source = """
 package foobar
 
@@ -56,7 +56,29 @@ package foobar
     assertErrors(List(lineError(4, List("15"))), source, Map("maxLineLength" -> "15"))
   }
 
-  @Test def testWithTwoMax() {
+  @Test def testWithImports(): Unit = {
+    val source = """
+package foobar
+import org.scalastyle.file.SuperLongImportClass
+
+    object Foobar {
+      import org.scalastyle.file._
+}
+""";
+
+    assertErrors(
+      List(lineError(5, List("15"))),
+      source,
+      Map("maxLineLength" -> "15", "ignoreImports" -> "true"))
+
+    assertErrors(
+      List(lineError(3, List("15")), lineError(5, List("15")), lineError(6, List("15"))),
+      source,
+      Map("maxLineLength" -> "15"))
+  }
+
+
+  @Test def testWithTwoMax(): Unit = {
     val source = """
 package foobar
 
@@ -69,7 +91,7 @@ package foobar
     assertErrors(List(lineError(4, List("15")), lineError(6, List("15"))), source, Map("maxLineLength" -> "15"))
   }
 
-  @Test def testWithSpacesTabs() {
+  @Test def testWithSpacesTabs(): Unit = {
     val source = """
 package foobar
 

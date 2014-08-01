@@ -43,19 +43,19 @@ class MagicNumberChecker extends ScalariformChecker {
   def verify(ast: CompilationUnit): List[ScalastyleError] = {
     val ignores = getString("ignore", DefaultIgnore).split(",").toSet
 
-    val intList = for (
-      t <- localvisit(ast.immediateChildren(0));
-      f <- traverse(t);
-      if (matches(f, ignores))
-    ) yield {
+    val intList = for {
+      t <- localvisit(ast.immediateChildren(0))
+      f <- traverse(t)
+      if matches(f, ignores)
+    } yield {
       f
     }
 
-    val valList = (for (
-      t <- localvisitVal(ast.immediateChildren(0));
-      f <- traverseVal(t);
+    val valList = (for {
+      t <- localvisitVal(ast.immediateChildren(0))
+      f <- traverseVal(t)
       g <- listAllowedMagicNumbers(f)
-    ) yield {
+    } yield {
       g
     }).map{
       case Expr(List(t: Expr)) => t
@@ -95,7 +95,7 @@ class MagicNumberChecker extends ScalariformChecker {
 
   private def toIntegerLiteralToken(list: List[Token]): Option[String] = {
     list match {
-      case List(Token(tokenType, text, start, end)) if (tokenType == INTEGER_LITERAL) => Some(text)
+      case List(Token(tokenType, text, start, end)) if (tokenType == INTEGER_LITERAL) => Some(text.replaceAll("[Ll]", ""))
       case _ => None
     }
   }

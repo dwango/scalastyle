@@ -35,18 +35,26 @@ case class HiddenTokenInfo(tokens: Seq[HiddenToken])
 case class LineColumn(line: Int, column: Int)
 
 case class Lines(lines: Array[Line], lastChar: Char) {
-  def toLineColumn(position: Int): Option[LineColumn] = {
+
+  def findLineAndIndex(position:Int):Option[(Line, Int)] = {
     var i = 0
 
     lines.foreach(l => {
       i = i + 1
       if (position >= l.start && position < l.end) {
-        return Some(LineColumn(i, position - l.start))
+        return Some((l, i))
       }
     })
 
     None
   }
+
+  def toLineColumn(position: Int): Option[LineColumn] =
+    findLineAndIndex(position) map {case (line, index) => LineColumn(index, position - line.start)}
+
+  def toFullLineTuple(position: Int): Option[(LineColumn, LineColumn)] =
+    findLineAndIndex(position) map {case (line, index) =>  (LineColumn( index, 0 ), LineColumn(index + 1, 0)) }
+
 }
 
 class ScalastyleChecker[T <: FileSpec] {
@@ -72,7 +80,7 @@ object Checker {
   type CheckerClass = Class[_ <: Checker[_]]
 
   private def comments(tokens: List[Token]): List[Comment] = tokens.map(t => {
-    if (t.associatedWhitespaceAndComments == null) List() else t.associatedWhitespaceAndComments.comments
+    if (t.associatedWhitespaceAndComments == null) Nil else t.associatedWhitespaceAndComments.comments // scalastyle:ignore null
   }).flatten
 
   def parseScalariform(source: String): Option[ScalariformAst] = {
@@ -87,9 +95,13 @@ object Checker {
 
   def verifySource[T <: FileSpec](configuration: ScalastyleConfiguration, classes: List[ConfigurationChecker], file: T, source: String): List[Message[T]] = {
     if (source.isEmpty()) {
-      return Nil
+      Nil
+    } else {
+      verifySource0(configuration, classes, file, source)
     }
+  }
 
+  private def verifySource0[T <: FileSpec](configuration: ScalastyleConfiguration, classes: List[ConfigurationChecker], file: T, source: String): List[Message[T]] = {
     val lines = parseLines(source)
     val scalariformAst = parseScalariform(source)
 
@@ -102,13 +114,13 @@ object Checker {
       case c: FileChecker => c.verify(file, c.level, lines, lines)
       case c: ScalariformChecker => scalariformAst match {
         case Some(ast) => c.verify(file, c.level, ast.ast, lines)
-        case None => List[Message[T]]()
+        case None => Nil
       }
       case c: CombinedChecker => scalariformAst match {
         case Some(ast) => c.verify(file, c.level, CombinedAst(ast.ast, lines), lines)
-        case None => List[Message[T]]()
+        case None => Nil
       }
-      case _ => List[Message[T]]()
+      case _ => Nil
     }).flatten.filter(m => CommentFilter.filterApplies(m, commentFilters))
   }
 

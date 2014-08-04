@@ -18,12 +18,13 @@ version := "0.3.3"
 
 description := "Scalastyle style checker for Scala"
 
+resolvers += "sonatype-releases" at "https://oss.sonatype.org/content/repositories/releases/"
+
 libraryDependencies ++= Seq(
   "com.danieltrinh" %% "scalariform" % "0.1.5",
   "com.typesafe" % "config" % "1.2.0",
   "junit" % "junit" % "4.11" % "test",
   "org.scalatest" %% "scalatest" % "2.2.0" % "test",
-  //"com.github.scopt" %% "scopt" % "3.2.0",
   "com.novocode" % "junit-interface" % "0.10" % "test",
   "org.reflections" % "reflections" % "0.9.9-RC2" % "test" exclude("org.javassist", "javassist") exclude("com.google.guava", "guava"),
   "com.google.guava" % "guava" % "15.0" % "test",

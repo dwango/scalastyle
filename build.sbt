@@ -10,7 +10,7 @@ git.baseVersion := "0.5.0"
 
 scalaVersion := "2.11.1"
 
-crossScalaVersions := Seq("2.11.1", "2.10.2", "2.10.1")
+crossScalaVersions := Seq("2.11.1", "2.10.3", "2.10.2")
 
 scalacOptions := Seq("-deprecation")
 

@@ -17,17 +17,16 @@
 package org.scalastyle
 
 import java.lang.reflect.Modifier
+
 import scala.collection.convert.WrapAsScala.asScalaSet
 import org.junit.Test
 import org.reflections.Reflections
 import org.scalatest.junit.AssertionsForJUnit
 import com.typesafe.config.ConfigFactory
-import java.lang.reflect.Method
 
 // scalastyle:off multiple.string.literals
 
 class ScalastyleDefinitionTest extends AssertionsForJUnit {
-
   @Test
   def checkAllCheckersInScalastyleDefinition(): Unit = {
     val classLoader = this.getClass().getClassLoader()
@@ -52,8 +51,5 @@ class ScalastyleDefinitionTest extends AssertionsForJUnit {
 
       assert(errorKey == c.id, "errorKey and id do not match for " + c.className)
     }
-
-
   }
-
 }

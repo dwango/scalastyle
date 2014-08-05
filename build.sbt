@@ -27,6 +27,7 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "2.2.0" % "test",
   "com.novocode" % "junit-interface" % "0.10" % "test",
   "org.reflections" % "reflections" % "0.9.9-RC2" % "test" exclude("org.javassist", "javassist") exclude("com.google.guava", "guava"),
+  "org.slf4j" % "slf4j-simple" % "1.7.7" % "test",
   "com.google.guava" % "guava" % "15.0" % "test",
   "org.javassist" % "javassist" % "3.18.2-GA" % "test"
 )

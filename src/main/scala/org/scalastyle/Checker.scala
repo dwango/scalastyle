@@ -26,7 +26,7 @@ import scala.io.Source
 import java.nio.charset.MalformedInputException
 import scala.io.Codec
 import scala.collection.JavaConversions.seqAsJavaList
-import scala.collection.JavaConversions.asScalaIterable
+import scala.collection.JavaConversions.collectionAsScalaIterable
 
 case class Line(text: String, start: Int, end: Int)
 
@@ -64,7 +64,7 @@ class ScalastyleChecker[T <: FileSpec] {
   }
 
   def checkFilesAsJava(configuration: ScalastyleConfiguration, files: java.util.List[T]): java.util.List[Message[T]] = {
-    seqAsJavaList(privateCheckFiles(configuration, asScalaIterable(files)))
+    seqAsJavaList(privateCheckFiles(configuration, files.toIterable))
   }
 
   private[this] def privateCheckFiles(configuration: ScalastyleConfiguration, files: Iterable[T]): Seq[Message[T]] = {
@@ -132,7 +132,7 @@ object Checker {
       }
       verifySource(configuration, classes, file, s)
     } catch {
-      case e: Exception => List(StyleException(file: T, None, message = e.getMessage(), stacktrace = e.getStackTraceString))
+      case e: Exception => List(StyleException(file: T, None, message = e.getMessage, stacktrace = e.getStackTrace.mkString("", "\n", "\n")))
     }
   }
 

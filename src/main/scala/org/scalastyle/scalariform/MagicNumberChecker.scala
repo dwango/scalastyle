@@ -137,7 +137,7 @@ class MagicNumberChecker extends ScalariformChecker {
 
   private def patternHasConstantVisit(t: List[ExprElement]): List[Expr] = t match {
     case List(n: New) => n.template.templateParentsOpt match {
-      case Some(x) => argumentExprsVisit(x.argumentExprss)
+      case Some(x) => argumentExprsVisit(x.typeAndArgs._2)
       case _ => List()
     }
     case List(c: CallExpr) => argumentExprsVisit(c.newLineOptsAndArgumentExprss.map(_._2))

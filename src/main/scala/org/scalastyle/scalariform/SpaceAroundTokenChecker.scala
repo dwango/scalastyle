@@ -45,7 +45,7 @@ trait SpaceAroundTokenChecker extends ScalariformChecker {
         && !right.associatedWhitespaceAndComments.containsNewline
         && checkSpaces(left, middle, right))
     } yield {
-      PositionError(middle.offset, List(middle.getText))
+      PositionError(middle.offset, List(middle.text))
     }).toList
   }
 

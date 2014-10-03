@@ -38,14 +38,6 @@ javaOptions in Test += "-Dfile.encoding=UTF-8"
 
 publishMavenStyle := true
 
-publishTo := Some(Resolver.file("file", new File("target/maven")))
-
-bintrayPublishSettings
-
-bintray.Keys.repository in bintray.Keys.bintray := "scalastyle"
-
-bintray.Keys.bintrayOrganization in bintray.Keys.bintray := Some("scalastyle")
-
 licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html"))
 
 pomIncludeRepository := { _ => false }
